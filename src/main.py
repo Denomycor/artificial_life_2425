@@ -7,7 +7,7 @@ from simulation import simulation
 def init_torch():
     if(torch.cuda.is_available()):
         torch.set_default_device("cuda")
-        print("Enabled cuda as defaylt device")
+        print("Enabled cuda as default device")
 
 
 def main():

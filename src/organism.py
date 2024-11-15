@@ -19,9 +19,13 @@ class neural(torch.nn.Module):
     
     def __init__(self):
         super().__init__()
-        self.l1 = torch.nn.Linear(1,1)
+        self.l1 = torch.nn.Linear(10,10)
+        self.l2 = torch.nn.Linear(10,10)
+        self.l3 = torch.nn.Linear(10,10)
 
     def forward(self, input):
-        out = torch.nn.functional.relu(self.l1(input))
+        a1 = torch.nn.functional.relu(self.l1(input))
+        a2 = torch.nn.functional.relu(self.l2(a1))
+        out = torch.nn.functional.relu(self.l3(a2))
         return out
 
