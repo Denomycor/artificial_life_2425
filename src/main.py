@@ -13,7 +13,7 @@ def init_torch():
 def main():
     init_torch()
 
-    sim = simulation(vec2(10, 10), 8)
+    sim = simulation(vec2(10, 10), 8, 10)
     sim.spawn_random_population()
     sim.grid.print()
 

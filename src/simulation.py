@@ -6,9 +6,12 @@ from random import randint
 # Main class for the simulation
 class simulation:
 
-    def __init__(self, grid_size: vec2, initial_pop: int):
+    def __init__(self, grid_size: vec2, initial_pop: int, max_steps: int):
+        self.step = 0
+        self.max_steps = max_steps
         self.grid = grid(grid_size)
         self.initial_pop = initial_pop
+        self.organism_list = []
 
     # Find random positions for the initial population of the simulation
     def spawn_random_population(self):
@@ -20,6 +23,22 @@ class simulation:
                     has_position = True
                     org = organism(self, pos)
                     self.grid.set_organism(pos, org)
+                    self.organism_list.append(org)
+
+    # Step the simulation once
+    def run_step(self):
+        for org in self.organism_list:
+            org.process()
+
+    # Run the simulation
+    def run(self):
+        for _ in range(self.max_steps):
+            self.run_step()
+
+    # Remove an organism from the simulation
+    def erase_organism(self, organism):
+        self.organism_list.remove(organism)
+        self.grid.buffer[organism.pos] = None
 
 
 # The 2D discrete space of the simulation
@@ -41,7 +60,7 @@ class grid:
         return self.buffer[pos]
 
     # Set the organism on the grid at pos
-    def set_organism(self, pos: vec2, value):
+    def set_organism(self, pos: vec2, value: organism | None):
         self.buffer[pos] = value
 
     # Whether an organism exists at pos
