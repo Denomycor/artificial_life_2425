@@ -1,5 +1,4 @@
 import torch
-
 from utils import vec2
 from simulation import simulation
 

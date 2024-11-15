@@ -14,6 +14,7 @@ class organism:
         self.sickness = 0
         self.neural = neural()
     
+    # Called for each organism for each step of the simulation
     def process(self):
         #TODO: do sensor and action functions
         input = None
