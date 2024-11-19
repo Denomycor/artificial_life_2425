@@ -39,13 +39,14 @@ class organism:
 
     def sensor_position_available(self, relative_pos: vec2) -> float:
         pos = self.pos + relative_pos
-        return 1 if self.sim.grid.has_organism(pos) else 0
+        if not self.sim.grid.is_within_bounds(pos):
+            return 0
+        return 1 if not self.sim.grid.has_organism(pos) else 0
 
     def sensor_nearest_sickness(self) -> float:
         organisms = filter(lambda e: e != self, self.sim.organism_list)
-        sickness = map(lambda e: e.sickness, organisms)
-        min_sickness = reduce(min, sickness, float('inf'))
-        return min_sickness
+        nearest_organism = min(organisms, key=lambda e: self.pos.distance_to(e.pos), default=None)
+        return nearest_organism.sickness if nearest_organism else float('inf')
 
 
     """
@@ -54,10 +55,8 @@ class organism:
 
     def action_move_to(self, relative_pos: vec2):
         pos = self.pos + relative_pos
-        if not self.sim.grid.has_organism(pos):
-            self.sim.grid.buffer[self.pos] = None
-            self.sim.grid.buffer[pos] = self
-            self.pos = pos
+        if self.sensor_position_available(relative_pos):
+            self.sim.grid.move_organism(self.pos, pos)
 
 
 # Organism's ai
