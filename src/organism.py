@@ -53,7 +53,11 @@ class organism:
     """
 
     def action_move_to(self, relative_pos: vec2):
-        pass
+        pos = self.pos + relative_pos
+        if not self.sim.grid.has_organism(pos):
+            self.sim.grid.buffer[self.pos] = None
+            self.sim.grid.buffer[pos] = self
+            self.pos = pos
 
 
 # Organism's ai
