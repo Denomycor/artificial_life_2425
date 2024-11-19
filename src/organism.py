@@ -3,6 +3,7 @@ import torch.nn
 import torch.nn.functional
 
 from utils import vec2
+from functools import reduce
 
 
 # The class representing each living organism in the simulation
@@ -19,6 +20,36 @@ class organism:
         #TODO: do sensor and action functions
         input = None
         out_mat: torch.Tensor = neural.forward(input)
+
+    def get_neural_genes(self):
+        return self.neural.state_dict()
+
+    def set_neural_genes(self, genes):
+        self.neural.load_state_dict(genes)
+
+    """
+    Organism sensors
+    """
+
+    def sensor_distance_nearest(self) -> float:
+        organisms = filter(lambda e: e != self, self.sim.organism_list)
+        distances = map(lambda e: self.pos.distance_to(e.pos), organisms)
+        min_distance = reduce(min, distances, float('inf'))
+        return min_distance
+
+    def sensor_position_available(self, relative_pos: vec2) -> float:
+        pass
+
+    def sensor_nearest_sickness(self) -> float:
+        pass
+
+
+    """
+    Organism actions
+    """
+
+    def action_move_to(self, relative_pos: vec2):
+        pass
 
 
 # Organism's ai
