@@ -38,10 +38,14 @@ class organism:
         return min_distance
 
     def sensor_position_available(self, relative_pos: vec2) -> float:
-        pass
+        pos = self.pos + relative_pos
+        return 1 if self.sim.grid.has_organism(pos) else 0
 
     def sensor_nearest_sickness(self) -> float:
-        pass
+        organisms = filter(lambda e: e != self, self.sim.organism_list)
+        sickness = map(lambda e: e.sickness, organisms)
+        min_sickness = reduce(min, sickness, float('inf'))
+        return min_sickness
 
 
     """
