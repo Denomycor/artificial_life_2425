@@ -1,20 +1,16 @@
 import torch
-from utils import vec2
-from simulation import simulation
 
 
 def init_torch():
+    torch.manual_seed(40)
     if(torch.cuda.is_available()):
         torch.set_default_device("cuda")
         print("Enabled cuda as default device")
 
 
+# TODO: Entry point
 def main():
     init_torch()
-
-    sim = simulation(vec2(10, 10), 8, 10)
-    sim.spawn_random_population()
-    sim.grid.print()
 
 
 if __name__ == "__main__":

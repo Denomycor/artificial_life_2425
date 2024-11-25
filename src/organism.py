@@ -25,7 +25,7 @@ class organism:
         return self.neural.state_dict()
 
     def set_neural_genes(self, genes):
-        self.neural.load_state_dict(genes)
+        self.neural.load_state_dict(genes, False)
 
     """
     Organism sensors
@@ -62,6 +62,8 @@ class organism:
 # Organism's ai
 class neural(torch.nn.Module):
     
+    arch = [10,10,10,10]
+
     def __init__(self):
         super().__init__()
         self.l1 = torch.nn.Linear(10,10)

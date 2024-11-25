@@ -1,4 +1,6 @@
-from organism import organism
+from typing import OrderedDict
+import gen
+from organism import organism, neural
 from utils import vec2
 from random import randint
 
@@ -14,16 +16,22 @@ class simulation:
         self.organism_list = []
 
     # Find random positions for the initial population of the simulation
-    def spawn_random_population(self):
+    def random_initial_state(self):
+        genes = gen.generate_random_gene(neural.arch)
         for _ in range(self.initial_pop):
             has_position = False
             while(not has_position):
                 pos = vec2(randint(0, self.grid.size.x-1), randint(0, self.grid.size.y-1))
                 if(not self.grid.has_organism(pos)):
                     has_position = True
-                    org = organism(self, pos)
-                    self.grid.set_organism(pos, org)
-                    self.organism_list.append(org)
+                    self.create_new_organism(pos, genes)
+
+    # Creates a new organism in the given pos and genes
+    def create_new_organism(self, pos: vec2, genes: OrderedDict):
+        org = organism(self, pos)
+        org.set_neural_genes(genes)
+        self.grid.set_organism(pos, org)
+        self.organism_list.append(org)
 
     # Step the simulation once
     def run_step(self):
@@ -39,6 +47,7 @@ class simulation:
     def erase_organism(self, organism):
         self.organism_list.remove(organism)
         self.grid.buffer[organism.pos] = None
+
 
 
 # The 2D discrete space of the simulation
