@@ -73,6 +73,10 @@ class grid:
         self.set_organism(from_pos, None)
         self.set_organism(to_pos, org)
         org.pos = to_pos
+        
+    # Check if the position is within the grid bounds
+    def is_within_bounds(self, pos: vec2) -> bool:
+        return 0 <= pos.x < self.size.x and 0 <= pos.y < self.size.y
 
     # Print the grid
     def print(self):

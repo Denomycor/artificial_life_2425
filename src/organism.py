@@ -81,6 +81,7 @@ class organism:
         pos = self.pos + relative_pos
         if self.sensor_position_available(relative_pos):
             self.sim.grid.move_organism(self.pos, pos)
+            self.pos = pos
 
 
 # Organism's ai
