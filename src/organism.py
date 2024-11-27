@@ -17,15 +17,39 @@ class organism:
     
     # Called for each organism for each step of the simulation
     def process(self):
-        #TODO: do sensor and action functions
-        input = None
-        out_mat: torch.Tensor = neural.forward(input)
+        input_data = [
+            self.sensor_distance_nearest(),                 # Distance to nearest organism
+            self.sensor_position_available(vec2(0, 1)),    # Is up available?
+            self.sensor_position_available(vec2(0, -1)),   # Is down available?
+            self.sensor_position_available(vec2(-1, 0)),   # Is left available?
+            self.sensor_position_available(vec2(1, 0)),    # Is right available?
+            self.sensor_nearest_sickness(),                # Sickness level of nearest organism
+        ]
+        
+        input_tensor = torch.tensor(input_data, dtype=torch.float32)
+        
+        #out_mat: torch.Tensor = neural.forward(input)
+
+        output_tensor = self.neural.forward(input_tensor)
+        
+        directions = [
+            vec2(0, 1),   # Up
+            vec2(0, -1),  # Down
+            vec2(-1, 0),  # Left
+            vec2(1, 0),   # Right
+        ]
+        
+        best_action_index = torch.argmax(output_tensor[:4]).item()
+        best_direction = directions[best_action_index]
+        
+        self.action_move_to(best_direction)
+        
 
     def get_neural_genes(self):
         return self.neural.state_dict()
 
     def set_neural_genes(self, genes):
-        self.neural.load_state_dict(genes)
+        self.neural.load_state_dict(genes, False)
 
     """
     Organism sensors
@@ -38,10 +62,15 @@ class organism:
         return min_distance
 
     def sensor_position_available(self, relative_pos: vec2) -> float:
-        pass
+        pos = self.pos + relative_pos
+        if not self.sim.grid.is_within_bounds(pos):
+            return 0
+        return 1 if not self.sim.grid.has_organism(pos) else 0
 
     def sensor_nearest_sickness(self) -> float:
-        pass
+        organisms = filter(lambda e: e != self, self.sim.organism_list)
+        nearest_organism = min(organisms, key=lambda e: self.pos.distance_to(e.pos), default=None)
+        return nearest_organism.sickness if nearest_organism else float('inf')
 
 
     """
@@ -49,21 +78,25 @@ class organism:
     """
 
     def action_move_to(self, relative_pos: vec2):
-        pass
+        pos = self.pos + relative_pos
+        if self.sensor_position_available(relative_pos):
+            self.sim.grid.move_organism(self.pos, pos)
 
 
 # Organism's ai
 class neural(torch.nn.Module):
     
+    arch = [6,10,10,4]
+
     def __init__(self):
         super().__init__()
-        self.l1 = torch.nn.Linear(10,10)
+        self.l1 = torch.nn.Linear(6,10)
         self.l2 = torch.nn.Linear(10,10)
-        self.l3 = torch.nn.Linear(10,10)
+        self.l3 = torch.nn.Linear(10,4)
 
     def forward(self, input: torch.Tensor) -> torch.Tensor:
         a1 = torch.nn.functional.relu(self.l1(input))
         a2 = torch.nn.functional.relu(self.l2(a1))
-        out = torch.nn.functional.relu(self.l3(a2))
+        out = self.l3(a2)
         return out
 
