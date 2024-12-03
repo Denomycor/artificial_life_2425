@@ -1,6 +1,5 @@
 from functools import reduce
 from typing import OrderedDict
-from organism import organism
 from simulation import simulation
 from utils import vec2
 import torch
@@ -11,7 +10,8 @@ def fitness(sim) -> float:
     return reduce(lambda acc, e: acc + e.sickness, sim.organism_list, 0)
 
 
-# TODO: Cross two different genes to create a new one
+# Cross two different genes to create a new one
+# NOTE: This crosses the OrderedDicts, ideally the tensors inside would also be crossed
 def cross_genes(st: OrderedDict, nd: OrderedDict) -> OrderedDict:
     child = OrderedDict()
     for key in st.keys():
@@ -22,7 +22,8 @@ def cross_genes(st: OrderedDict, nd: OrderedDict) -> OrderedDict:
     return child
 
 
-# TODO: Create a new gene which is a mutation of the parameter gene
+# Create a new gene which is a mutation of the parameter gene
+# NOTE: This creates a new tensor and adds it to the respective key
 def mutate_genes(gene: OrderedDict, mutation_rate: float = 0.1) -> OrderedDict:
     mutated_gene = OrderedDict()
     for key, value in gene.items():
@@ -36,19 +37,21 @@ def mutate_genes(gene: OrderedDict, mutation_rate: float = 0.1) -> OrderedDict:
             mutated_gene[key] = value
     return mutated_gene
 
+
 # TODO: From the population and it's fitness select pairs of organisms to generate offspring
-def selection_tournament(population: list[simulation], fit: list[float], tournament_size: int = 3) -> list[tuple[organism, organism]]:
+# This is wrong, its shouldn't be possible to reapeat candidates, also the best candidates have the lower fitness
+def selection_tournament(population: list[simulation], fit: list[float], tournament_size: int = 3) -> list[tuple[simulation, simulation]]:
     selected_pairs = []
     for _ in range(len(population) // 2):  # Create pairs
         # Select first parent
         candidates = torch.randperm(len(population))[:tournament_size]
         best_candidate = max(candidates, key=lambda idx: fit[idx])
-        parent1 = population[best_candidate].organism_list[0]  # Assume 1 organism per simulation
+        parent1 = population[best_candidate]
 
         # Select second parent
         candidates = torch.randperm(len(population))[:tournament_size]
         best_candidate = max(candidates, key=lambda idx: fit[idx])
-        parent2 = population[best_candidate].organism_list[0]
+        parent2 = population[best_candidate]
 
         selected_pairs.append((parent1, parent2))
     return selected_pairs
@@ -74,7 +77,7 @@ def start_genetic_alg(population_size: int) -> list[simulation]:
     population = []
     for _ in range(population_size):
         sim = simulation(grid_size, organism_population, max_steps)
-        sim.random_initial_state()
+        sim.spawn_random_population()
         population.append(sim)
     return population
 
@@ -83,36 +86,38 @@ def start_genetic_alg(population_size: int) -> list[simulation]:
 def run_genetic_alg(generations: int, population_size: int):
     # Initialize the population
     population = start_genetic_alg(population_size)
-    
+
+    best_individual = (None, float('inf'))
     
     for gen in range(generations):
         print(f"Generation {gen + 1}/{generations}")
         
         # Evaluate the fitness of the population
-        fit = []
+        fit: list[float] = []
         for individual in population:
             individual.run()
             fit.append(fitness(individual))
             
-        # Check that organisms exist in the population
-        if not population[0].organism_list:
-            raise ValueError("Population has no organisms! Check simulation initialization.")
-            
+        for i in range(len(population)):
+            # The best individual has the less fitness
+            best_individual = (population[i], fit[i]) if fit[i] < best_individual[1] else best_individual
+
         # Select parents for the next generation
         selected_pairs = selection_tournament(population, fit)
         
         # Crossover and mutation
         new_population = []
         for parent1, parent2 in selected_pairs:
-            child_gene = cross_genes(parent1.get_neural_genes(), parent2.get_neural_genes())
+            child_gene = cross_genes(parent1.get_genes_of_organisms(), parent2.get_genes_of_organisms())
             child_gene = mutate_genes(child_gene)
             
             # Create new simulation with the child gene
             sim = simulation(vec2(20,20), 50, 20)
-            sim.organism_list[0].set_neural_genes(child_gene)
+            sim.spawn_random_population()
+            sim.set_genes_of_organisms(child_gene)
+
+            # Population will be smaller each generation (we should grab some elementes from the older popualtion until we reach the population_size again)
             new_population.append(sim)
             
         population = new_population
-        
-    best_index = fit.index(max(fit))
-    return population[best_index]
+

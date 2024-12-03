@@ -1,3 +1,4 @@
+from typing import OrderedDict
 from organism import organism
 from utils import vec2
 from random import randint
@@ -13,7 +14,7 @@ class simulation:
         self.initial_pop = initial_pop
         self.organism_list = []
 
-    # Find random positions for the initial population of the simulation
+    # Find random positions and genes for the initial population of the simulation
     def spawn_random_population(self):
         for _ in range(self.initial_pop):
             has_position = False
@@ -21,13 +22,19 @@ class simulation:
                 pos = vec2(randint(0, self.grid.size.x-1), randint(0, self.grid.size.y-1))
                 if(not self.grid.has_organism(pos)):
                     has_position = True
+                    # When created an automatic set of random genes is generated
                     org = organism(self, pos)
                     self.grid.set_organism(pos, org)
                     self.organism_list.append(org)
                     
-    # Randomly initialize the state of the simulation
-    def random_initial_state(self):
-        self.spawn_random_population()
+    # For each organism set its genes to the provided ones
+    def set_genes_of_organisms(self, genes: OrderedDict):
+        for org in self.organism_list:
+            org.set_neural_genes(genes)
+
+    # Gets the genes that this simulation's organisms ar using
+    def get_genes_of_organisms(self) -> OrderedDict:
+        return self.organism_list[0].get_neural_genes()
 
     # Step the simulation once
     def run_step(self):
@@ -64,7 +71,7 @@ class grid:
         return self.buffer[pos]
 
     # Set the organism on the grid at pos
-    def set_organism(self, pos: vec2, value: organism):
+    def set_organism(self, pos: vec2, value):
         self.buffer[pos] = value
 
     # Whether an organism exists at pos

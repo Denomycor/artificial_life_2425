@@ -26,9 +26,7 @@ class organism:
             self.sensor_nearest_sickness(),                # Sickness level of nearest organism
         ]
         
-        input_tensor = torch.tensor(input_data, dtype=torch.float32)
-        
-        #out_mat: torch.Tensor = neural.forward(input)
+        input_tensor = torch.tensor(input_data)
 
         output_tensor = self.neural.forward(input_tensor)
         
@@ -37,12 +35,13 @@ class organism:
             vec2(0, -1),  # Down
             vec2(-1, 0),  # Left
             vec2(1, 0),   # Right
-        ]
+        ]   
         
-        best_action_index = torch.argmax(output_tensor[:4]).item()
-        best_direction = directions[best_action_index]
-        
-        self.action_move_to(best_direction)
+        maxed = 0 
+        for i in range(4):
+            maxed = i if output_tensor[i].item() > output_tensor[maxed].item() else maxed
+
+        self.action_move_to(directions[maxed])
         
 
     def get_neural_genes(self):
