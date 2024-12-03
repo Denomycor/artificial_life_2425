@@ -60,7 +60,7 @@ class grid:
         return self.buffer[pos]
 
     # Set the organism on the grid at pos
-    def set_organism(self, pos: vec2, value: organism | None):
+    def set_organism(self, pos: vec2, value: organism):
         self.buffer[pos] = value
 
     # Whether an organism exists at pos
