@@ -24,6 +24,10 @@ class simulation:
                     org = organism(self, pos)
                     self.grid.set_organism(pos, org)
                     self.organism_list.append(org)
+                    
+    # Randomly initialize the state of the simulation
+    def random_initial_state(self):
+        self.spawn_random_population()
 
     # Step the simulation once
     def run_step(self):
