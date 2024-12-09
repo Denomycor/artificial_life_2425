@@ -1,6 +1,7 @@
 import torch
 import torch.nn
 import torch.nn.functional
+import random
 
 from utils import vec2
 from functools import reduce
@@ -12,37 +13,40 @@ class organism:
     def __init__(self, sim, pos: vec2):
         self.sim = sim
         self.pos = pos
-        self.sickness = 0
+        self.sickness = random.randint(30, 60) if torch.rand(1).item() < 0.5 else 0
         self.neural = neural()
     
     # Called for each organism for each step of the simulation
     def process(self):
+        self.forward_ai()
+
+    # Use the neural network to make the organism act this step
+    def forward_ai(self):
         input_data = [
-            self.sensor_distance_nearest(),                 # Distance to nearest organism
+            self.sensor_distance_nearest(),                # Distance to nearest organism
             self.sensor_position_available(vec2(0, 1)),    # Is up available?
             self.sensor_position_available(vec2(0, -1)),   # Is down available?
             self.sensor_position_available(vec2(-1, 0)),   # Is left available?
             self.sensor_position_available(vec2(1, 0)),    # Is right available?
             self.sensor_nearest_sickness(),                # Sickness level of nearest organism
         ]
-        
-        input_tensor = torch.tensor(input_data)
 
+        input_tensor = torch.tensor(input_data)
         output_tensor = self.neural.forward(input_tensor)
-        
+
         directions = [
             vec2(0, 1),   # Up
             vec2(0, -1),  # Down
             vec2(-1, 0),  # Left
             vec2(1, 0),   # Right
         ]   
-        
+
         maxed = 0 
-        for i in range(4):
+        for i in range(len(directions)):
             maxed = i if output_tensor[i].item() > output_tensor[maxed].item() else maxed
 
         self.action_move_to(directions[maxed])
-        
+
 
     def get_neural_genes(self):
         return self.neural.state_dict()
@@ -80,7 +84,7 @@ class organism:
         pos = self.pos + relative_pos
         if self.sensor_position_available(relative_pos):
             self.sim.grid.move_organism(self.pos, pos)
-            self.pos = pos
+            # self.pos = pos   not needed
 
 
 # Organism's ai

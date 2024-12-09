@@ -3,7 +3,10 @@
 import torch 
 import torch.nn
 import torch.nn.functional
-
+import gen
+import organism
+import simulation
+from utils import vec2
 
 
 class Model(torch.nn.Module):
@@ -23,9 +26,16 @@ class Model(torch.nn.Module):
 torch.set_default_device("cuda")
 torch.manual_seed(41)
 m = Model()
-input = torch.rand(4)
-out = m.forward(input)
 
-for i in range(4):
-    print(out[i])
+# Testing funcs:
 
+gene1 = gen.generate_random_gene([4,4,4,4])
+gene2 = gen.generate_random_gene([4,4,4,4])
+crossed = gen.cross_genes(gene1, gene2)
+mutated = gen.mutate_genes(gene1, 0.5)
+
+sim = simulation.simulation(vec2(10,10), 10, 10)
+sim.spawn_random_population()
+
+
+gen.run_genetic_alg(10, 10)
