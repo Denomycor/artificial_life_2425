@@ -41,10 +41,14 @@ class simulation:
         for org in self.organism_list:
             org.process()
 
+
     # Run the simulation
-    def run(self):
+    def run(self, display: bool = False):
         for _ in range(self.max_steps):
             self.run_step()
+            if(display):
+                self.grid.print()
+                print()
 
     # Remove an organism from the simulation
     def erase_organism(self, organism):

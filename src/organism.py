@@ -49,19 +49,7 @@ class organism:
         self.action_move_to(directions[maxed])
 
     def update_sickness(self):
-        sickness_spread_radius = 4
-        near_organisms = list(filter(lambda e: e.pos.distance_to(self.pos) < sickness_spread_radius and e != self, self.sim.organism_list))
-        size = len(near_organisms)
-        if size > 0:
-            near_sickness = map(lambda e: e.sickness, near_organisms)
-            avg_sickness = int(sum(near_sickness) / size)
-            
-            avg_diff = avg_sickness - self.sickness
-            if(avg_diff > 0):
-                self.sickness += avg_diff//2
-        else:
-            self.sickness = max(0, self.sickness - 5)
-
+        self.sickness = self.pos.x * 2
 
     def get_neural_genes(self):
         return self.neural.state_dict()
