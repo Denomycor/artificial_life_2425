@@ -24,7 +24,6 @@ class Model(torch.nn.Module):
         return o
 
 torch.set_default_device("cuda")
-torch.manual_seed(41)
 m = Model()
 
 # Testing funcs:
@@ -34,8 +33,14 @@ gene2 = gen.generate_random_gene([4,4,4,4])
 crossed = gen.cross_genes(gene1, gene2)
 mutated = gen.mutate_genes(gene1, 0.5)
 
-sim = simulation.simulation(vec2(10,10), 10, 10)
+sim = simulation.simulation(vec2(10,10), 50, 10)
 sim.spawn_random_population()
 
+# for org in sim.organism_list:
+#     print(org.sickness)
 
-gen.run_genetic_alg(10, 10)
+sim.grid.print()
+
+sim.organism_list[0].update_sickness()
+
+# gen.run_genetic_alg(10, 10)

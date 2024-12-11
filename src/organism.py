@@ -13,12 +13,13 @@ class organism:
     def __init__(self, sim, pos: vec2):
         self.sim = sim
         self.pos = pos
-        self.sickness = random.randint(30, 60) if torch.rand(1).item() < 0.5 else 0
+        self.sickness = random.randint(30, 60) if torch.rand(1).item() < 1 else 0
         self.neural = neural()
     
     # Called for each organism for each step of the simulation
     def process(self):
         self.forward_ai()
+        self.update_sickness()
 
     # Use the neural network to make the organism act this step
     def forward_ai(self):
@@ -46,6 +47,20 @@ class organism:
             maxed = i if output_tensor[i].item() > output_tensor[maxed].item() else maxed
 
         self.action_move_to(directions[maxed])
+
+    def update_sickness(self):
+        sickness_spread_radius = 4
+        near_organisms = list(filter(lambda e: e.pos.distance_to(self.pos) < sickness_spread_radius and e != self, self.sim.organism_list))
+        size = len(near_organisms)
+        if size > 0:
+            near_sickness = map(lambda e: e.sickness, near_organisms)
+            avg_sickness = int(sum(near_sickness) / size)
+            
+            avg_diff = avg_sickness - self.sickness
+            if(avg_diff > 0):
+                self.sickness += avg_diff//2
+        else:
+            self.sickness = max(0, self.sickness - 5)
 
 
     def get_neural_genes(self):

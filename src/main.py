@@ -1,4 +1,5 @@
 import torch
+import random
 from gen import run_genetic_alg
 
 
@@ -6,6 +7,11 @@ def init_torch():
     if(torch.cuda.is_available()):
         torch.set_default_device("cuda")
         print("Enabled cuda as default device")
+
+
+def deterministic(seed: int):
+    torch.manual_seed(seed)
+    random.seed(seed)
 
 
 def main():
