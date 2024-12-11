@@ -22,8 +22,11 @@ def main():
     generations = 50  # Number of generations to evolve
     population_size = 10  # Size of population in each generation
 
-    run_genetic_alg(generations, population_size)
+    sim, fit = run_genetic_alg(generations, population_size)
     print("\nGenetic Algorithm complete!")
+    if(sim != None):
+        print("Best fitness:", fit)
+        print("Best Genes:", sim.get_genes_of_organisms())
     
     
 if __name__ == "__main__":

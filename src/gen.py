@@ -6,7 +6,7 @@ import torch
 
 
 # Get the fitness value of a population
-def fitness(sim) -> float:
+def fitness(sim) -> int:
     return reduce(lambda acc, e: acc + e.sickness, sim.organism_list, 0)
 
 
@@ -44,7 +44,7 @@ def mutate_genes(gene: OrderedDict, mutation_rate: float = 0.1) -> OrderedDict:
 
 
 # From the population and it's fitness select pairs of organisms to generate offspring
-def selection_tournament(population: list[simulation], fit: list[float], tournament_size: int, offspring_nr: int) -> list[tuple[simulation, simulation]]:
+def selection_tournament(population: list[simulation], fit: list[int], tournament_size: int, offspring_nr: int) -> list[tuple[simulation, simulation]]:
     selected_pairs = []
     for _ in range(offspring_nr):
         # Select first parent
@@ -90,13 +90,13 @@ def run_genetic_alg(generations: int, population_size: int):
     # Initialize the population
     population = start_genetic_alg(population_size)
 
-    best_individual_ever = (None, float('inf'))
+    best_individual_ever = (None, int(99999999999999))
     
     for gen in range(generations):
         print(f"==Generation {gen + 1}/{generations}==")
         
         # Evaluate the fitness of the population
-        fit: list[float] = []
+        fit: list[int] = []
         for individual in population:
             print(f"Running simulation {population.index(individual)}")
             individual.run()
@@ -133,4 +133,6 @@ def run_genetic_alg(generations: int, population_size: int):
             
         population = new_population
         assert(len(population) == population_size)
+
+    return best_individual_ever
 
