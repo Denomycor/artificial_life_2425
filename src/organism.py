@@ -24,22 +24,22 @@ class organism:
     # Use the neural network to make the organism act this step
     def forward_ai(self):
         input_data = [
-            self.sensor_distance_nearest(),                # Distance to nearest organism
-            self.sensor_position_available(vec2(0, 1)),    # Is up available?
-            self.sensor_position_available(vec2(0, -1)),   # Is down available?
-            self.sensor_position_available(vec2(-1, 0)),   # Is left available?
-            self.sensor_position_available(vec2(1, 0)),    # Is right available?
-            self.sensor_nearest_sickness(),                # Sickness level of nearest organism
+            self.sensor_distance_nearest(),
+            self.sensor_position_available(vec2(0, 1)),
+            self.sensor_position_available(vec2(0, -1)),
+            self.sensor_position_available(vec2(-1, 0)),
+            self.sensor_position_available(vec2(1, 0)),
+            self.sensor_nearest_sickness(),
         ]
 
         input_tensor = torch.tensor(input_data)
         output_tensor = self.neural.forward(input_tensor)
 
         directions = [
-            vec2(0, 1),   # Up
-            vec2(0, -1),  # Down
-            vec2(-1, 0),  # Left
-            vec2(1, 0),   # Right
+            vec2(0, 1),
+            vec2(0, -1),
+            vec2(-1, 0),
+            vec2(1, 0),
         ]   
 
         maxed = 0 
@@ -76,7 +76,7 @@ class organism:
     def sensor_nearest_sickness(self) -> float:
         organisms = filter(lambda e: e != self, self.sim.organism_list)
         nearest_organism = min(organisms, key=lambda e: self.pos.distance_to(e.pos), default=None)
-        return nearest_organism.sickness if nearest_organism else float('inf')
+        return nearest_organism.sickness if nearest_organism else 0
 
 
     """

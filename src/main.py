@@ -19,10 +19,9 @@ def deterministic(seed: int):
 def main():
     init_torch()
     
-    # Step 2: Start the genetic algorithm (adapted from my code)
     print("\nStarting Genetic Algorithm...")
-    generations = 50  # Number of generations to evolve
-    population_size = 10  # Size of population in each generation
+    generations = 50
+    population_size = 10
 
     sim, fit = run_genetic_alg(generations, population_size)
     print("\nGenetic Algorithm complete!")
