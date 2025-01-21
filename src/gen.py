@@ -86,7 +86,7 @@ def start_genetic_alg(population_size: int) -> list[simulation]:
 
 
 # TODO: Work in progress. Main loop of the genetic algorithm
-def run_genetic_alg(generations: int, population_size: int):
+def run_genetic_alg(generations: int, population_size: int, mutate_parents: int = 0):
     # Initialize the population
     population = start_genetic_alg(population_size)
 
@@ -114,7 +114,29 @@ def run_genetic_alg(generations: int, population_size: int):
         # Crossover and mutation
         new_population = []
         for parent1, parent2 in selected_pairs:
-            child_gene = cross_genes(parent1.get_genes_of_organisms(), parent2.get_genes_of_organisms())
+            if mutate_parents == 1:
+                # LPLO
+                parent1_genes = mutate_genes(parent1.get_genes_of_organisms())
+                parent2_genes = mutate_genes(parent2.get_genes_of_organisms())
+            elif mutate_parents == 2:
+                # HPLO
+                parent1_genes = mutate_genes(parent1.get_genes_of_organisms(), 0.8)
+                parent2_genes = mutate_genes(parent2.get_genes_of_organisms(), 0.8)
+            elif mutate_parents == 3:
+                # CPLO
+                if gen % 10 == 0:
+                    # High mutation rate every 10 generations
+                    parent1_genes = mutate_genes(parent1.get_genes_of_organisms(), 0.8)
+                    parent2_genes = mutate_genes(parent2.get_genes_of_organisms(), 0.8)
+                else:
+                    parent1_genes = mutate_genes(parent1.get_genes_of_organisms())
+                    parent2_genes = mutate_genes(parent2.get_genes_of_organisms())
+            else:
+                # NPLO
+                parent1_genes = parent1.get_genes_of_organisms()
+                parent2_genes = parent2.get_genes_of_organisms()
+                
+            child_gene = cross_genes(parent1_genes, parent2_genes)
             child_gene = mutate_genes(child_gene)
             
             # Create new simulation with the child gene
@@ -135,4 +157,3 @@ def run_genetic_alg(generations: int, population_size: int):
         assert(len(population) == population_size)
 
     return best_individual_ever
-
