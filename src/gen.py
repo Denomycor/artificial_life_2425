@@ -109,7 +109,7 @@ def run_genetic_alg(generations: int, population_size: int, mutate_parents: int 
         print(best_individual_ever[1])
 
         # Select parents for the next generation
-        selected_pairs = selection_tournament(population, fit, len(population)//4, len(population)//2)
+        selected_pairs = selection_tournament(population, fit, len(population)//4, len(population)-2)
         
         # Crossover and mutation
         new_population = []

@@ -20,10 +20,22 @@ def main():
     init_torch()
     
     print("\nStarting Genetic Algorithm...")
+    fit0 = run(0)
+    fit1 = run(1)
+    fit2 = run(2)
+    fit3 = run(3)
+
+    print(fit0)
+    print(fit1)
+    print(fit2)
+    print(fit3)
+    
+
+def run(simulation_alg: int):
     generations = 50
     population_size = 10
 
-    sim, fit = run_genetic_alg(generations, population_size)
+    sim, fit = run_genetic_alg(generations, population_size, simulation_alg)
     print("\nGenetic Algorithm complete!")
     if(sim != None):
         genes = sim.get_genes_of_organisms()
@@ -37,7 +49,8 @@ def main():
         winner_sim.grid.print()
         print()
         winner_sim.run(True)
-    
+    return fit
+
     
 if __name__ == "__main__":
     main()

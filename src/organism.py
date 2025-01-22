@@ -24,12 +24,12 @@ class organism:
     # Use the neural network to make the organism act this step
     def forward_ai(self):
         input_data = [
-            self.sensor_distance_nearest(),
+            # self.sensor_distance_nearest(),
             self.sensor_position_available(vec2(0, 1)),
             self.sensor_position_available(vec2(0, -1)),
             self.sensor_position_available(vec2(-1, 0)),
             self.sensor_position_available(vec2(1, 0)),
-            self.sensor_nearest_sickness(),
+            # self.sensor_nearest_sickness(),
         ]
 
         input_tensor = torch.tensor(input_data)
@@ -71,7 +71,7 @@ class organism:
         pos = self.pos + relative_pos
         if not self.sim.grid.is_within_bounds(pos):
             return 0
-        return 1 if not self.sim.grid.has_organism(pos) else 0
+        return 1.0 if not self.sim.grid.has_organism(pos) else 0.0
 
     def sensor_nearest_sickness(self) -> float:
         organisms = filter(lambda e: e != self, self.sim.organism_list)
@@ -93,7 +93,7 @@ class organism:
 # Organism's ai
 class neural(torch.nn.Module):
     
-    arch = [6,10,10,4]
+    arch = [4,10,10,4]
 
     def __init__(self):
         super().__init__()
