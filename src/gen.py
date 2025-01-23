@@ -28,7 +28,6 @@ def cross_genes(st: OrderedDict, nd: OrderedDict) -> OrderedDict:
 
 
 # Create a new gene which is a mutation of the parameter gene
-# TODO: Ideally the mutation could happen on the tensor level and not on the key level
 def mutate_genes(gene: OrderedDict, mutation_rate: float = 0.1) -> OrderedDict:
     mutated_gene = OrderedDict()
     for key, value in gene.items():
@@ -85,7 +84,6 @@ def start_genetic_alg(population_size: int) -> list[simulation]:
     return population
 
 
-# TODO: Work in progress. Main loop of the genetic algorithm
 def run_genetic_alg(generations: int, population_size: int, mutate_parents: int = 0):
     # Initialize the population
     population = start_genetic_alg(population_size)
